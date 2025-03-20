@@ -28,11 +28,8 @@ app.use("/uploads/resume", express.static("uploads.resume"));
 // connection of mongodb
 connectDb();
 // define port
-<<<<<<< HEAD
-const PORT = process.env.PORT || 5000;
-=======
+
 const PORT = process.env.PORT || 6006;
->>>>>>> 71a47d9 (dockerize application)
 
 //api routes
 app.use("/api/v1/auth", authRoutes);
@@ -42,12 +39,10 @@ app.use("/api/v1/job-seeker", jobSeekerRoutes);
 app.use("/api/v1", getAllJobsRoutes);
 app.use("/api/v1", getSingleJobRoutes);
 
-<<<<<<< HEAD
-=======
 app.get("/", (req, res) => {
   res.send("The api is working");
 });
->>>>>>> 71a47d9 (dockerize application)
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
