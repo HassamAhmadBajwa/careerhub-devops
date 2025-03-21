@@ -3,7 +3,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 pnpm-debug.log
-package-lock.json
+
 yarn.lock
 pnpm-lock.yaml
 
@@ -14,7 +14,7 @@ pnpm-lock.yaml
 .env.test
 .env.production
 
-# Logs
+# Logs:
 logs/
 *.log
 npm-debug.log*
