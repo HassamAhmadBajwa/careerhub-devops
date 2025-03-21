@@ -35,4 +35,3 @@ jobs:
       - name: Build Backend
         run: |
           cd backend
-          npm run build
