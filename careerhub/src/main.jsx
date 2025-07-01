@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Provider } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
 import store from "./redux/store.jsx";
 import {
   Landing,
@@ -14,7 +15,12 @@ import {
   JobseekerDashboard,
   PrivateRoute,
 } from "./Pages/index.jsx";
-import { Profile } from "./Components/index.jsx";
+import {
+  MyJobs,
+  PostJob,
+  Profile,
+  ViewApplications,
+} from "./Components/index.jsx";
 
 import {
   Route,
@@ -35,6 +41,16 @@ const router = createBrowserRouter(
       </Route>
       <Route element={<PrivateRoute allowedRoles={["employer"]} />}>
         <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+        <Route path="/employer/dashboard/createjob" element={<PostJob />} />
+        <Route
+          path="/employer/dashboard/update-job/:id"
+          element={<PostJob isEdit={true} />}
+        />
+        <Route path="employer/dashboard/myjobs" element={<MyJobs />} />
+        <Route
+          path="employer/dashboard/applications"
+          element={<ViewApplications />}
+        />
       </Route>
       <Route element={<PrivateRoute allowedRoles={["job-seeker"]} />}>
         <Route

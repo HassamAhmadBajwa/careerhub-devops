@@ -6,6 +6,7 @@ import {
   getAllJobs,
   updateJobStatus,
   deleteJob,
+  getPlatformStats,
 } from "../controllers/admin-controller.js";
 import { isAuthenticated, isAdmin } from "../middleware/auth-middleware.js";
 
@@ -19,4 +20,5 @@ router.route("/users/:id").delete(isAuthenticated, isAdmin, deleteUser);
 router.route("/jobs").get(isAuthenticated, isAdmin, getAllJobs);
 router.route("/jobs/:id").delete(isAuthenticated, isAdmin, deleteJob);
 router.route("/jobs/:id").put(isAuthenticated, isAdmin, updateJobStatus);
+router.route("/stats").get(isAuthenticated, isAdmin, getPlatformStats);
 export default router;

@@ -1,0 +1,33 @@
+# Node modules (ignore both frontend and backend)
+**/node_modules/
+
+# Environment variables
+**/.env
+
+# Build outputs
+careerhub/dist/
+careerhub/build/
+backend/build/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# Test coverage
+coverage/
+
+# Optional: If using Docker
+*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

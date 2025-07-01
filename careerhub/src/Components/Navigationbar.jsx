@@ -36,7 +36,7 @@ const Navigationbar = () => {
         <div className="d-md-none mx-auto">
           <NavDropdown
             title={
-              <span className="text-white">
+              <span className="text-primary">
                 <FaUserCircle className="me-1" /> Profile
               </span>
             }
@@ -54,14 +54,15 @@ const Navigationbar = () => {
           aria-controls="navbar-nav"
           onClick={() => setExpanded(expanded ? false : true)}
         >
-          <FaBars className="text-white" />
+          <FaBars className="fw-bold" style={{ color: "var(--primary-600)" }} />
         </Navbar.Toggle>
 
         {/* Navbar Items (Collapsible in Small Screens) */}
         <Navbar.Collapse id="navbar-nav">
           <Nav className="mx-auto text-center">
             <Nav.Link
-              href="/jobseeker/home"
+              as={Link}
+              to="/home"
               className=" fw-bold"
               onClick={() => setExpanded(false)}
               style={{ color: "var(--primary-600)" }}
@@ -69,7 +70,8 @@ const Navigationbar = () => {
               Home
             </Nav.Link>
             <Nav.Link
-              href="/jobseeker/about"
+              as={Link}
+              to="/about"
               className="fw-bold"
               style={{ color: "var(--primary-600)" }}
               onClick={() => setExpanded(false)}
@@ -78,7 +80,7 @@ const Navigationbar = () => {
             </Nav.Link>
             <Nav.Link
               as={Link}
-              to="/job-seeker/profile"
+              to="/profile"
               className="fw-bold active"
               style={{ color: "var(--primary-600)" }}
               onClick={() => setExpanded(false)}
@@ -95,7 +97,11 @@ const Navigationbar = () => {
                   className="fw-bold"
                   style={{ color: "var(--primary-600)" }}
                 >
-                  <FaUserCircle className="me-1" /> Profile
+                  <FaUserCircle
+                    className="me-1 fw-bold"
+                    style={{ color: "var(--primary-600)" }}
+                  />{" "}
+                  Profile
                 </span>
               }
               style={{ color: "var(--primary-600)" }}

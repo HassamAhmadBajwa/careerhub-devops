@@ -15,6 +15,12 @@ export const register = async (req, res) => {
         success: false,
       });
     }
+    if (phoneNumber.length !== 11) {
+      return res.status(400).json({
+        message: "Phone number must be exactly 13 characters long",
+        success: false,
+      });
+    }
     // if user already exists return error.
     const existingUser = await User.findOne({ email });
     if (existingUser) {

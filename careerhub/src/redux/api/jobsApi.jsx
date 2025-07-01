@@ -14,7 +14,16 @@ export const jobApiSlice = createApi({
     getSingleJob: builder.query({
       query: (id) => `/job/${id}`,
     }),
+    //  Get jobs posted by the logged-in employer
+    getEmployerJobs: builder.query({
+      query: () => "/employer/my-jobs",
+      providesTags: ["Jobs"],
+    }),
   }),
 });
-export const { useGetAllJobsQuery, useGetSingleJobQuery } = jobApiSlice;
+export const {
+  useGetAllJobsQuery,
+  useGetSingleJobQuery,
+  useGetEmployerJobsQuery,
+} = jobApiSlice;
 export default jobApiSlice;

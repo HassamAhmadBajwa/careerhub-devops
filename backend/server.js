@@ -10,6 +10,7 @@ import employerRoutes from "./routes/employer-Routes.js";
 import jobSeekerRoutes from "./routes/jobSeeker-Routes.js";
 import getAllJobsRoutes from "./routes/job-Routes.js";
 import getSingleJobRoutes from "./routes/job-Routes.js";
+import jobApplicationRoutes from "./routes/Job-ApplicationRoute.js";
 dotenv.config({});
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/v1/employer", employerRoutes);
 app.use("/api/v1/job-seeker", jobSeekerRoutes);
 app.use("/api/v1", getAllJobsRoutes);
 app.use("/api/v1", getSingleJobRoutes);
+app.use("/api/v1/applications", jobApplicationRoutes);
 
 app.get("/", (req, res) => {
   res.send("The api is working");

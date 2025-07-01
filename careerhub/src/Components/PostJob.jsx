@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   usePostJobMutation,
+  useUpdateJobMutation,
   useGetEmployerJobsQuery,
 } from "../redux/api/employerApi";
 import { Form, Button, Spinner, Container, Row, Col } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 
-const PostJob = () => {
-  const [jobData, setJobData] = useState({
+const PostJob = ({ isEdit = false, jobData = {} }) => {
+  const { id } = useParams();
+  const { data: jobsData } = useGetEmployerJobsQuery();
+
+  // Initial state for job details
+  const [jobDetails, setJobDetails] = useState({
     title: "",
     companyName: "",
     location: "",
@@ -16,37 +23,70 @@ const PostJob = () => {
     applicationDeadline: "",
     category: "",
   });
-  const [postJob, { isLoading }] = usePostJobMutation();
-  const { data: jobs, isLoading: loadingJobs } = useGetEmployerJobsQuery();
 
+  const navigate = useNavigate();
+
+  const [postJob, { isLoading }] = usePostJobMutation();
+  const [updateJob, { isLoading: updating }] = useUpdateJobMutation();
+
+  // If editing, populate the form with existing job data
+  // This effect runs when the component mounts or when isEdit, id, or jobsData
+  useEffect(() => {
+    if (isEdit && id && jobsData?.jobs) {
+      const foundJob = jobsData.jobs.find((job) => job._id === id);
+      if (foundJob) {
+        setJobDetails({
+          title: foundJob.title || "",
+          companyName: foundJob.companyName || "",
+          location: foundJob.location || "",
+          requirements: foundJob.requirements || "",
+          salaryRange: foundJob.salaryRange || "",
+          jobType: foundJob.jobType || "",
+          category: foundJob.category || "",
+          applicationDeadline:
+            foundJob.applicationDeadline?.substring(0, 10) || "",
+          description: foundJob.description || "",
+        });
+      }
+    }
+  }, [isEdit, id, jobsData]);
+
+  // Handle form input changes
+  // This function updates the jobDetails state with the input values
   const handleChange = (e) => {
-    setJobData({ ...jobData, [e.target.name]: e.target.value });
+    setJobDetails({ ...jobDetails, [e.target.name]: e.target.value });
   };
+
+  // Handle form submission
+  // This function either posts a new job or updates an existing job based on isEdit flag
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await postJob(jobData);
-      alert("Job posted successfully!");
-      setJobData({
-        title: "",
-        companyName: "",
-        location: "",
-        requirements: "",
-        salaryRange: "",
-        jobType: "",
-        applicationDeadline: "",
-        category: "",
-      });
+      if (isEdit) {
+        await updateJob({ jobId: id, updateData: jobDetails });
+        toast.success("Job updated successfully!");
+      } else {
+        await postJob(jobDetails);
+        toast.success("Job posted successfully!");
+      }
+      navigate("/employer/dashboard/myjobs");
     } catch (error) {
-      alert(error?.data?.message || "Failed to post job");
+      toast.error(error?.data?.message || "Failed to post job");
     }
   };
   return (
     <Container>
-      <h2 className="mt-5 text-center fw-bold">Employer Dashboard</h2>
+      <h2 className="mt-5 text-center text-primary fw-bold">
+        Employer Dashboard
+      </h2>
+
+      <Button variant="dark" onClick={() => navigate(-1)} className="mb-3">
+        ← Go back
+      </Button>
       <Row className="">
-        <h4>Post a Job</h4>
+        <h2 className="text-center mb-2 fw-bold">
+          {isEdit ? "Edit Job" : "Post a New Job"}
+        </h2>
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
@@ -55,7 +95,7 @@ const PostJob = () => {
                 <Form.Control
                   type="text"
                   name="title"
-                  value={jobData.title}
+                  value={jobDetails.title}
                   onChange={handleChange}
                   required
                 />
@@ -65,7 +105,7 @@ const PostJob = () => {
                 <Form.Control
                   type="text"
                   name="companyName"
-                  value={jobData.companyName}
+                  value={jobDetails.companyName}
                   onChange={handleChange}
                   required
                 />
@@ -75,7 +115,7 @@ const PostJob = () => {
                 <Form.Control
                   type="text"
                   name="location"
-                  value={jobData.location}
+                  value={jobDetails.location}
                   onChange={handleChange}
                   required
                 />
@@ -85,7 +125,7 @@ const PostJob = () => {
                 <Form.Control
                   as="textarea"
                   name="requirements"
-                  value={jobData.requirements}
+                  value={jobDetails.requirements}
                   onChange={handleChange}
                   required
                 />
@@ -95,7 +135,7 @@ const PostJob = () => {
                 <Form.Control
                   type="text"
                   name="salaryRange"
-                  value={jobData.salaryRange}
+                  value={jobDetails.salaryRange}
                   onChange={handleChange}
                   required
                 />
@@ -107,7 +147,7 @@ const PostJob = () => {
                 <Form.Label className="mt-2">Job Type</Form.Label>
                 <Form.Select
                   name="jobType"
-                  value={jobData.jobType}
+                  value={jobDetails.jobType}
                   onChange={handleChange}
                   required
                 >
@@ -122,9 +162,10 @@ const PostJob = () => {
                 <Form.Control
                   type="date"
                   name="applicationDeadline"
-                  value={jobData.applicationDeadline}
+                  value={jobDetails.applicationDeadline}
                   onChange={handleChange}
                   required
+                  min={new Date().toISOString().split("T")[0]}
                 />
               </Form.Group>
               <Form.Group>
@@ -132,13 +173,23 @@ const PostJob = () => {
                 <Form.Control
                   type="text"
                   name="category"
-                  value={jobData.category}
+                  value={jobDetails.category}
                   onChange={handleChange}
                   required
                 />
               </Form.Group>
-              <Button type="submit" className="mt-3" disabled={isLoading}>
-                {isLoading ? <Spinner size="sm" /> : "Post Job"}
+              <Button
+                type="submit"
+                className="mt-3"
+                disabled={isLoading || updating}
+              >
+                {isLoading || updating ? (
+                  <Spinner size="sm" />
+                ) : isEdit ? (
+                  "Update Job"
+                ) : (
+                  "Post Job"
+                )}
               </Button>
             </Col>
           </Row>

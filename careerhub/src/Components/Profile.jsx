@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
@@ -73,10 +74,11 @@ const Profile = () => {
     try {
       const updatedProfile = await updateProfile(formData).unwrap();
       dispatch(updateProfileSuccess(updatedProfile.user));
-      alert("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (err) {
       dispatch(profileFailure(err?.data?.message || "Update failed"));
-      alert("Failed to update profile");
+
+      toast.error(err?.data?.message || "Failed to update profile");
     }
   };
 

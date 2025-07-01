@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../redux/api/authApi";
-
+import { toast } from "react-toastify";
 import {
   authStart,
   authSuccess,
@@ -20,9 +20,14 @@ const Login = () => {
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Handle input changes
+  // This function updates the formData state when the user types in the input fields.
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  // Handle form submission
+  // This function is called when the user submits the login form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(authStart());
@@ -34,14 +39,18 @@ const Login = () => {
 
       if (role === "admin") {
         navigate("/admin/dashboard");
+        toast.success("Login successful as Admin");
       } else if (role === "employer") {
         navigate("/employer/dashboard");
+        toast.success("Login successful as Employer");
       } else if (role === "job-seeker") {
         navigate("/job-seeker/dashboard");
+        toast.success("Login successful as Job Seeker");
       }
     } catch (error) {
       console.log("Login Error:", error);
       dispatch(authFailure(error.data?.message || "Login failded"));
+      toast.error(error.data?.message || "Login failed");
     }
   };
   return (
@@ -81,6 +90,7 @@ const Login = () => {
             onChange={handleChange}
             required
           >
+            <option>Select-Role</option>
             <option value="job-seeker">Job Seeker</option>
             <option value="employer">Employer</option>
             <option value="admin">Admin</option>

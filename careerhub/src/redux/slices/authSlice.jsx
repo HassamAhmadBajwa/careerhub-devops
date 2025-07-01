@@ -1,12 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
-  token: localStorage.getItem("token") || null,
-  role: localStorage.getItem("role") || null,
-  loading: localStorage.getItem("token") || null,
+  user: user || null,
+  token: token || null,
+  role: role || null,
+  loading: false,
   error: null,
-  isAuthenticated: false,
+  isAuthenticated: !!(user && token),
 };
 
 const authSlice = createSlice({

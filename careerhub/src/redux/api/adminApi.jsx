@@ -47,6 +47,9 @@ export const adminApi = createApi({
         method: "DELETE",
       }),
     }),
+    getAdminStats: builder.query({
+      query: () => "/admin/stats",
+    }),
   }),
 });
 
@@ -57,6 +60,7 @@ export const {
   useGetJobsQuery,
   useUpdateJobStatusMutation,
   useDeleteJobMutation,
+  useGetAdminStatsQuery,
 } = adminApi;
 
 export default adminApi;

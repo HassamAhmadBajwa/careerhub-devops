@@ -122,3 +122,46 @@ export const deleteJob = async (req, res) => {
     });
   }
 };
+
+// Monitor Platform Activity: Admin Dashboard Stats
+export const getPlatformStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalJobSeekers = await User.countDocuments({ role: "job-seeker" });
+    const totalEmployers = await User.countDocuments({ role: "employer" });
+    const totalJobs = await Job.countDocuments();
+
+    const totalApplications = await Job.aggregate([
+      {
+        $project: {
+          totalApplicants: { $size: { $ifNull: ["$applicants", []] } },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalApplicants" },
+        },
+      },
+    ]);
+
+    const applicationCount = totalApplications[0]?.total || 0;
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalUsers,
+        totalJobSeekers,
+        totalEmployers,
+        totalJobs,
+        totalApplications: applicationCount,
+      },
+    });
+  } catch (error) {
+    console.log("Admin Stats Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch platform stats",
+    });
+  }
+};

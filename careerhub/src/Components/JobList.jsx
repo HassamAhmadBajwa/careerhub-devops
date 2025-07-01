@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useGetAllJobsQuery } from "../redux/api/jobsApi";
 import { Spinner, Row, Col, Card, Button, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 const JobList = () => {
   const { data, isLoading, error } = useGetAllJobsQuery();
@@ -18,6 +18,9 @@ const JobList = () => {
 
   // Filter jobs based on user input
   const filteredJobs = jobs.filter((job) => {
+    const titleMatch =
+      search === "" || job.title.toLowerCase().includes(search.toLowerCase());
+
     const categoryMatch =
       category === "" ||
       job.category.toLowerCase().includes(category.toLowerCase());
@@ -30,10 +33,8 @@ const JobList = () => {
       location === "" ||
       job.location.toLowerCase().includes(location.toLowerCase());
 
-    return categoryMatch && jobTypeMatch && locationMatch;
+    return categoryMatch && jobTypeMatch && locationMatch && titleMatch;
   });
-
-  console.log("Filtered Jobs:", filteredJobs); // Debugging
 
   return (
     <div className="container mt-4">
@@ -73,6 +74,16 @@ const JobList = () => {
               />
             </Form.Group>
           </Card>
+
+          <Link
+            to="/job-seeker/dashboard/applied-jobs"
+            className=" d-block mt-3 w-100"
+          >
+            <Button className="w-100">Applied Jobs</Button>
+          </Link>
+          <Link to="/job-seeker/profile" className="d-block mt-3 w-100">
+            <Button className="w-100">Profile</Button>
+          </Link>
         </Col>
         <Col md={8}>
           <Row>

@@ -1,4 +1,4 @@
-import React from "react";
+import styled from "styled-components";
 import { Container, Table, Button, Spinner } from "react-bootstrap";
 import {
   useGetUsersQuery,
@@ -7,6 +7,7 @@ import {
   useDeleteJobMutation,
   useUpdateJobStatusMutation,
   useGetJobsQuery,
+  useGetAdminStatsQuery,
 } from "../redux/api/adminApi";
 import { Navigationbar } from "../Components/index";
 import { useDispatch } from "react-redux";
@@ -23,6 +24,7 @@ const AdminDashboard = () => {
     isLoading: usersLoading,
     refetch: refetchUsers,
   } = useGetUsersQuery();
+
   const [updateUserStatus] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
 
@@ -31,8 +33,15 @@ const AdminDashboard = () => {
     isLoading: jobsLoading,
     refetch: refetchJobs,
   } = useGetJobsQuery();
+
   const [moderateJob] = useUpdateJobStatusMutation();
   const [deleteJob] = useDeleteJobMutation();
+
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useGetAdminStatsQuery();
 
   //handle user activate/ suspension
   const handleUserStatus = async (id, isActive) => {
@@ -84,105 +93,140 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <Navigationbar />
-      <Container className="mt-4">
-        <h2 className="text-center">Admin Dashboard</h2>
+      <Wrapper>
+        <Navigationbar />
+        <Container className="mt-4">
+          <h2 className="text-center">Admin Dashboard</h2>
 
-        {/* User Management */}
-        <h3 className="mt-4">Manage Users</h3>
-        {usersLoading ? (
-          <Spinner animation="border" />
-        ) : (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users?.users?.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.isActive ? "Active" : "Suspended"}</td>
-                  <td>
-                    <Button
-                      variant={user.isActive ? "warning" : "success"}
-                      onClick={() => handleUserStatus(user._id, user.isActive)}
-                    >
-                      {user.isActive ? "Suspend" : "Activate"}
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteUser(user._id)}
-                      className="ms-2"
-                    >
-                      Delete
-                    </Button>
-                  </td>
+          <h3 className="mt-4">Platform Statistics</h3>
+
+          {statsLoading ? (
+            <p>Loading stats...</p>
+          ) : statsError ? (
+            <p className="text-danger">Failed to load stats</p>
+          ) : (
+            <Table bordered striped>
+              <tbody>
+                <tr>
+                  <td>Total Users</td>
+                  <td>{statsData?.stats?.totalUsers}</td>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
+                <tr>
+                  <td>Job Seekers</td>
+                  <td>{statsData?.stats?.totalJobSeekers}</td>
+                </tr>
+                <tr>
+                  <td>Employers</td>
+                  <td>{statsData?.stats?.totalEmployers}</td>
+                </tr>
+                <tr>
+                  <td>Total Jobs</td>
+                  <td>{statsData?.stats?.totalJobs}</td>
+                </tr>
+              </tbody>
+            </Table>
+          )}
 
-        {/* Job Moderation */}
-        <h3 className="mt-4">Moderate Jobs</h3>
-        {jobsLoading ? (
-          <Spinner animation="border" />
-        ) : (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Job Title</th>
-                <th>Company</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs?.jobs?.map((job) => (
-                <tr key={job._id}>
-                  <td>{job.title}</td>
-                  <td>{job.companyName}</td>
-                  <td>{job.status}</td>
-                  <td>
-                    {job.status !== "Approved" && (
+          {/* User Management */}
+          <h3 className="mt-4">Manage Users</h3>
+          {usersLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users?.users?.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.isActive ? "Active" : "Suspended"}</td>
+                    <td>
                       <Button
-                        variant="success"
-                        onClick={() => handleJobStatus(job._id, "Approved")}
+                        variant={user.isActive ? "warning" : "success"}
+                        onClick={() =>
+                          handleUserStatus(user._id, user.isActive)
+                        }
                       >
-                        Approve
+                        {user.isActive ? "Suspend" : "Activate"}
                       </Button>
-                    )}
-                    {job.status !== "Rejected" && (
                       <Button
-                        variant="warning"
-                        onClick={() => handleJobStatus(job._id, "Rejected")}
+                        variant="danger"
+                        onClick={() => handleDeleteUser(user._id)}
                         className="ms-2"
                       >
-                        Reject
+                        Delete
                       </Button>
-                    )}
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteJob(job._id)}
-                      className="ms-2"
-                    >
-                      Delete
-                    </Button>
-                  </td>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+
+          {/* Job Moderation */}
+          <h3 className="mt-4">Moderate Jobs</h3>
+          {jobsLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Company</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
-      </Container>
+              </thead>
+              <tbody>
+                {jobs?.jobs?.map((job) => (
+                  <tr key={job._id}>
+                    <td>{job.title}</td>
+                    <td>{job.companyName}</td>
+                    <td>{job.status}</td>
+                    <td>
+                      {job.status !== "Approved" && (
+                        <Button
+                          variant="success"
+                          onClick={() => handleJobStatus(job._id, "Approved")}
+                        >
+                          Approve
+                        </Button>
+                      )}
+                      {job.status !== "Rejected" && (
+                        <Button
+                          variant="warning"
+                          onClick={() => handleJobStatus(job._id, "Rejected")}
+                          className="ms-2"
+                        >
+                          Reject
+                        </Button>
+                      )}
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDeleteJob(job._id)}
+                        className="ms-2"
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Container>
+      </Wrapper>
     </>
   );
 };
 
 export default AdminDashboard;
+
+const Wrapper = styled.div``;

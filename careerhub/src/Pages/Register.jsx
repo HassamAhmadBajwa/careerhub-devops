@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
@@ -6,6 +7,7 @@ import { authSuccess } from "../redux/slices/authSlice";
 import { useRegisterMutation } from "../redux/api/authApi";
 
 const Register = () => {
+  // State to hold form data
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -13,33 +15,39 @@ const Register = () => {
     phoneNumber: "",
     role: "",
   });
-  const res = useRegisterMutation();
-  console.log(res);
 
+  const res = useRegisterMutation();
   const [register, { isLoading, error }] = useRegisterMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Handle input changes
+  // This function updates the formData state when the user types in the input fields.
   const handleChange = async (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  // Handle form submission
+  // This function is called when the user submits the registration form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await register(formData).unwrap();
-      console.log("user register successfully", response);
 
       dispatch(authSuccess(response));
       navigate("/login");
+      toast.success("Registration successful, please login");
     } catch (error) {
       if (error.response) {
         console.log("Error Response:", error.response);
         console.log("Error Status:", error.response.status);
         console.log("Error Data:", error.response.data);
+        toast.error(error.response.data.message || "Registration failed");
       } else if (error.request) {
         console.log("No Response from Server:", error.request);
+        toast.error("No response from server, please try again later");
       } else {
         console.log("Other Error:", error.message);
+        toast.error(error.message || "An unexpected error occurred");
       }
     }
   };
