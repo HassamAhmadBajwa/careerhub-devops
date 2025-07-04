@@ -1,0 +1,43 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_DATABASE: db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mern-app
+    restart: always
+
+  backeend:
+    image: hassamahmad/fyp-backend
+    container_name: careerhub-backend
+    ports:
+      - "5000:5000"
+    
+    depends_on:
+      - mongo
+    networks:
+      - mern-app
+    restart: always 
+
+  frontend:
+    image: hassamahmad/careerhub-project-frontend
+    container_name: careerhub-frontend
+    ports: 
+      - "3000:80"
+    depends_on:
+      - backeend
+    networks:
+      - mern-app
+    restart: always 
+volumes:
+    mongo_data:
+      
+
+networks:
+  mern-app:
+    driver: bridge

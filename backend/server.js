@@ -19,12 +19,31 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-const corsOptions = {
-  origin: "http://localhost:5173", // Allow frontend
-  credentials: true,
-};
-app.use(cors(corsOptions));
-app.use("/uploads/resume", express.static("uploads.resume"));
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost',
+  'http://127.0.0.1:5173',
+  'http://frontend:5173' // if Docker service name is `frontend`
+];
+
+
+app.use(cors({
+  origin: function (origin, callback) {
+    console.log("🚨 Incoming request origin:", origin); // ← Add this line
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+      console.log("🚨 Incoming request origin:", origin);
+    }
+  },
+  credentials: true
+}));
+
+
+
+
+app.use("/uploads/resume", express.static("uploads/resume"));
 
 // connection of mongodb
 connectDb();
